@@ -34,20 +34,11 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public String addFile(MultipartFile file) {
-//    Criteria criteria = Criteria.where("addresses").elemMatch(Criteria.where("name").is("朝阳区"));
-//    Query query = new Query(criteria);
-//    Document doc = mongoTemplate.findOne(query, Document.class);
     try {
-      String md5 = MD5Util.getMD5(file.getInputStream());
-
       File files = new File();
-      files.setContentType(file.getContentType());
       files.setName(file.getOriginalFilename());
-      files.setMd5(md5);
-      files.setSize(file.getSize());
-      files.setContent(new Binary(file.getBytes()));
-      //mongoTemplate.save(files);
-      mongoTemplate.insert(files,"fs");
+      files.setDocId(getDocIdByMd5(file));
+      mongoTemplate.insert(files, "fs");
       return files.getId();
     } catch (NoSuchAlgorithmException e) {
 
@@ -55,5 +46,25 @@ public class FileServiceImpl implements FileService {
     }
 
     return null;
+  }
+
+  /**
+   * 根据md5获取文件
+   * 存在时返回文件id，不存在时插入返回文件id
+   *
+   * @param file
+   * @return
+   */
+  private String getDocIdByMd5(MultipartFile file) throws IOException, NoSuchAlgorithmException {
+    String md5 = MD5Util.getMD5(file.getInputStream());
+    Document doc = mongoTemplate.findOne(new Query(Criteria.where("md5").is(md5)), Document.class, "doc");
+    if (doc == null) {
+      doc = new Document();
+      doc.setMd5(md5);
+      doc.setContent(new Binary(file.getBytes()));
+      doc.setSize(file.getSize());
+      mongoTemplate.insert(doc, "doc");
+    }
+    return doc.getId();
   }
 }
