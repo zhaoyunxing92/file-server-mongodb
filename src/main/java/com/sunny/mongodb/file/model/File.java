@@ -6,20 +6,27 @@ import java.io.Serializable;
  * @author sunny
  * @class: com.sunny.mongodb.file.model.File
  * @date: 2018-05-18 18:06
- * @des:
+ * @des: 文件
  */
 
 public class File extends Document implements Serializable {
   private static final long serialVersionUID = 3718103350794331126L;
   /**
+   * 文档id
+   */
+  private String docId;
+  /**
    * 文件名称
    */
   private String name;
 
-  /**
-   * 文件类型
-   */
-  private String contentType;
+  public String getDocId() {
+    return docId;
+  }
+
+  public void setDocId(String docId) {
+    this.docId = docId;
+  }
 
   public String getName() {
     return name;
@@ -27,13 +34,5 @@ public class File extends Document implements Serializable {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getContentType() {
-    return contentType;
-  }
-
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
   }
 }

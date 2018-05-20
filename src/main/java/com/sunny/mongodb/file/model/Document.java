@@ -16,7 +16,7 @@ public class Document implements Serializable {
   /**
    * 主键id
    */
-  @Id
+ // @Id
   private String id;
   /**
    * 文件md5
@@ -30,6 +30,11 @@ public class Document implements Serializable {
    * 文件内容
    */
   private Binary content;
+
+  /**
+   * 文件类型
+   */
+  private String contentType;
 
   public String getId() {
     return id;
@@ -61,5 +66,13 @@ public class Document implements Serializable {
 
   public void setContent(Binary content) {
     this.content = content;
+  }
+
+  public String getContentType() {
+    return contentType;
+  }
+
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
   }
 }
