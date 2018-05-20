@@ -1,0 +1,3 @@
+server:
+  port: 8101
+  address: localhost
