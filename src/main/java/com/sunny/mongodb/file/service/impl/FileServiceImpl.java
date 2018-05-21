@@ -14,11 +14,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+
+import static net.coobird.thumbnailator.Thumbnails.of;
 
 /**
  * @author sunny
@@ -77,6 +80,37 @@ public class FileServiceImpl implements FileService {
   }
 
   /**
+   * 处理图片
+   *
+   * @param id
+   * @param process
+   * @return
+   */
+  @Override
+  public File getProcessFileById(String id, String process) {
+    File file = getFileById(id);
+    if (null == file) {
+      return null;
+    }
+    if (null == process) {
+      return file;
+    }
+
+    try {
+      byte[] bytes = file.getContent().getData();
+      //重新设置图片
+      byte[] resizeBytes = resizeImage(bytes, process);
+      file.setContent(new Binary(resizeBytes));
+      file.setSize(resizeBytes.length);
+      file.setMd5(MD5Util.getMD5(resizeBytes));
+    } catch (NoSuchAlgorithmException e) {
+      //ignore
+      return file;
+    }
+    return file;
+  }
+
+  /**
    * 根据md5获取文件
    * 存在时返回文件id，不存在时插入返回文件id
    *
@@ -91,7 +125,7 @@ public class FileServiceImpl implements FileService {
       doc = new Document();
       doc.setMd5(md5);
       doc.setContent(new Binary(bytes));
-      doc.setSize((long) bytes.length);
+      doc.setSize(bytes.length);
       doc.setUploadDate(new Date());
       mongoTemplate.insert(doc, "doc");
     }
@@ -119,9 +153,50 @@ public class FileServiceImpl implements FileService {
    */
   private byte[] contraction(InputStream is) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    Thumbnails.of(is).scale(1f).outputQuality(0.3f).toOutputStream(out);
+    of(is).scale(1f).outputQuality(0.3f).toOutputStream(out);
     return out.toByteArray();
   }
 
+  /**
+   * 设置图片大小
+   *
+   * @param bytes
+   * @param process
+   * @return
+   */
+  private byte[] resizeImage(byte[] bytes, String process) {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    try {
+
+      InputStream in = new ByteArrayInputStream(bytes);
+      String[] ps = process.split(",");
+      int length = ps.length;
+      int width = 0, height = 0;
+      if (length == 3) {
+        if (ps[1].startsWith("h_")) {
+          height = Integer.valueOf(ps[1].substring(2));
+          width = Integer.valueOf(ps[2].substring(2));
+        } else if (ps[1].startsWith("w_")) {
+          height = Integer.valueOf(ps[1].substring(2));
+          width = Integer.valueOf(ps[2].substring(2));
+        }
+        Thumbnails.of(in).size(width, height).toOutputStream(out);
+      } else if (length == 2) {
+        if (ps[1].startsWith("h_")) {
+          height = Integer.valueOf(ps[1].substring(2));
+          Thumbnails.of(in).height(height).toOutputStream(out);
+        } else if (ps[1].startsWith("w_")) {
+          width = Integer.valueOf(ps[1].substring(2));
+          Thumbnails.of(in).width(width).toOutputStream(out);
+        }
+      } else {
+        return bytes;
+      }
+
+    } catch (IOException e) {
+      //e.printStackTrace();
+    }
+    return out.toByteArray();
+  }
 
 }

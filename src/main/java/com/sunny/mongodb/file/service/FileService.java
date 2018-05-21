@@ -25,4 +25,13 @@ public interface FileService {
    * @return
    */
   File getFileById(String id);
+
+  /**
+   * 处理图片
+   *
+   * @param id
+   * @param process
+   * @return
+   */
+  File getProcessFileById(String id, String process);
 }

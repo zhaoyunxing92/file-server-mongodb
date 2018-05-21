@@ -2,6 +2,7 @@ package com.sunny.mongodb.file.controller;
 
 import com.sunny.mongodb.file.model.File;
 import com.sunny.mongodb.file.service.FileService;
+import net.coobird.thumbnailator.Thumbnails;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -37,23 +39,22 @@ public class FileController {
    * 获取图片
    *
    * @param id
+   * @param process
    * @return
    */
   @GetMapping("/{id}")
-  public ResponseEntity<Object> getFileById(@PathVariable String id) {
-    File file = fileService.getFileById(id);
+  public ResponseEntity<Object> getFileById(@PathVariable String id, @RequestParam(name = "process", required = false) String process) {
+    File file = fileService.getProcessFileById(id, process);
     if (file != null) {
       return ResponseEntity.ok()
-          .header(HttpHeaders.ACCEPT_ENCODING, "gbk")
           //.header(HttpHeaders.ACCEPT_ENCODING, "gbk")
           .header(HttpHeaders.ETAG, file.getMd5())
           .header(HttpHeaders.SERVER, serverAddress)
-          .header(HttpHeaders.CONTENT_DISPOSITION, "name=\"" + file.getName() + "\"")
+          //.header(HttpHeaders.CONTENT_DISPOSITION, "name=\"" + file.getName() + "\"")
           .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
           .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.getSize()))
           .header("Connection", "keep-alive")
           .body(file.getContent().getData());
-
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("file [%s] not found", id));
     }
@@ -70,5 +71,4 @@ public class FileController {
   public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file) {
     return ResponseEntity.status(HttpStatus.OK).body(fileService.addFile(file));
   }
-
 }

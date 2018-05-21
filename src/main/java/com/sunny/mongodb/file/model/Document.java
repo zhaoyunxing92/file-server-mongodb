@@ -27,7 +27,7 @@ public class Document implements Serializable {
   /**
    * 文件大小
    */
-  private Long size;
+  private Integer size;
   /**
    * 文件内容
    */
@@ -58,16 +58,16 @@ public class Document implements Serializable {
     this.md5 = md5;
   }
 
-  public Long getSize() {
+  public Binary getContent() {
+    return content;
+  }
+
+  public Integer getSize() {
     return size;
   }
 
-  public void setSize(Long size) {
+  public void setSize(Integer size) {
     this.size = size;
-  }
-
-  public Binary getContent() {
-    return content;
   }
 
   public void setContent(Binary content) {
