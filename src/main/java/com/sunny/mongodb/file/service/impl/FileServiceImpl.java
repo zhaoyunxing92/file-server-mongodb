@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -98,7 +100,7 @@ public class FileServiceImpl implements FileService {
 
     try {
       byte[] bytes = file.getContent().getData();
-      //重新设置图片
+      //重新设置图片http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100,h_200
       byte[] resizeBytes = resizeImage(bytes, process);
       file.setContent(new Binary(resizeBytes));
       file.setSize(resizeBytes.length);
@@ -170,29 +172,33 @@ public class FileServiceImpl implements FileService {
 
       InputStream in = new ByteArrayInputStream(bytes);
       String[] ps = process.split(",");
-      int length = ps.length;
-      int width = 0, height = 0;
-      if (length == 3) {
-        if (ps[1].startsWith("h_")) {
-          height = Integer.valueOf(ps[1].substring(2));
-          width = Integer.valueOf(ps[2].substring(2));
-        } else if (ps[1].startsWith("w_")) {
-          height = Integer.valueOf(ps[1].substring(2));
-          width = Integer.valueOf(ps[2].substring(2));
-        }
-        Thumbnails.of(in).size(width, height).toOutputStream(out);
-      } else if (length == 2) {
-        if (ps[1].startsWith("h_")) {
-          height = Integer.valueOf(ps[1].substring(2));
-          Thumbnails.of(in).height(height).toOutputStream(out);
-        } else if (ps[1].startsWith("w_")) {
+      int width, height, length = ps.length;
+      String first = ps[0];
+      BufferedImage bufferedImage = ImageIO.read(in);
+      if (length == 2) {
+        if (first.startsWith("h_")) {
+          height = Integer.valueOf(first.substring(2));
           width = Integer.valueOf(ps[1].substring(2));
-          Thumbnails.of(in).width(width).toOutputStream(out);
+        } else if (first.startsWith("w_")) {
+          height = Integer.valueOf(first.substring(2));
+          width = Integer.valueOf(ps[1].substring(2));
+        } else {
+          return bytes;
+        }
+      } else if (length == 1) {
+        if (first.startsWith("h_")) {
+          height = Integer.valueOf(first.substring(2));
+          width = bufferedImage.getWidth();
+        } else if (first.startsWith("w_")) {
+          width = Integer.valueOf(first.substring(2));
+          height = bufferedImage.getHeight();
+        } else {
+          return bytes;
         }
       } else {
         return bytes;
       }
-
+      Thumbnails.of(bufferedImage).size(width, height).keepAspectRatio(false).toOutputStream(out);
     } catch (IOException e) {
       //e.printStackTrace();
     }
