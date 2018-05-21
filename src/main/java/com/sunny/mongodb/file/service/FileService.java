@@ -1,5 +1,6 @@
 package com.sunny.mongodb.file.service;
 
+import com.sunny.mongodb.file.model.File;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -16,4 +17,12 @@ public interface FileService {
    * @return
    */
   String addFile(MultipartFile file);
+
+  /**
+   * 获取文件
+   *
+   * @param id
+   * @return
+   */
+  File getFileById(String id);
 }

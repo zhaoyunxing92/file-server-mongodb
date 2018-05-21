@@ -5,6 +5,7 @@ import com.sunny.mongodb.file.model.File;
 import com.sunny.mongodb.file.service.FileService;
 import com.sunny.mongodb.file.util.MD5Util;
 import org.bson.types.Binary;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 /**
  * @author sunny
@@ -38,6 +40,8 @@ public class FileServiceImpl implements FileService {
       File files = new File();
       files.setName(file.getOriginalFilename());
       files.setDocId(getDocIdByMd5(file));
+      files.setUploadDate(new Date());
+      files.setContentType(file.getContentType());
       mongoTemplate.insert(files, "fs");
       return files.getId();
     } catch (NoSuchAlgorithmException e) {
@@ -46,6 +50,26 @@ public class FileServiceImpl implements FileService {
     }
 
     return null;
+  }
+
+  /**
+   * 获取文件
+   *
+   * @param id
+   * @return
+   */
+  @Override
+  public File getFileById(String id) {
+    File file = mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), File.class, "fs");
+    if (null == file) {
+      return null;
+    }
+    Document doc = getDocById(file.getDocId());
+    doc.setId(file.getId());
+    doc.setUploadDate(file.getUploadDate());
+    doc.setContentType(file.getContentType());
+    BeanUtils.copyProperties(doc, file);
+    return file;
   }
 
   /**
@@ -63,8 +87,19 @@ public class FileServiceImpl implements FileService {
       doc.setMd5(md5);
       doc.setContent(new Binary(file.getBytes()));
       doc.setSize(file.getSize());
+      doc.setUploadDate(new Date());
       mongoTemplate.insert(doc, "doc");
     }
     return doc.getId();
+  }
+
+  /**
+   * 根据id获取doc
+   *
+   * @param id
+   * @return
+   */
+  private Document getDocById(String id) {
+    return mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), Document.class, "doc");
   }
 }
