@@ -7,3 +7,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  http:
+    encoding:
+      charset: utf-8
+  mvc:
+    favicon:
+      enabled: false
