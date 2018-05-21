@@ -44,11 +44,16 @@ public class FileController {
     File file = fileService.getFileById(id);
     if (file != null) {
       return ResponseEntity.ok()
-          .header(HttpHeaders.ACCEPT_CHARSET,"utf-8")
+          .header(HttpHeaders.ACCEPT_ENCODING, "gbk")
+          //.header(HttpHeaders.ACCEPT_ENCODING, "gbk")
+          .header(HttpHeaders.ETAG, file.getMd5())
+          .header(HttpHeaders.SERVER, serverAddress)
           .header(HttpHeaders.CONTENT_DISPOSITION, "name=\"" + file.getName() + "\"")
           .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
-          .header(HttpHeaders.CONTENT_LENGTH, file.getSize() + "").header("Connection", "close")
+          .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.getSize()))
+          .header("Connection", "keep-alive")
           .body(file.getContent().getData());
+
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("file [%s] not found", id));
     }
