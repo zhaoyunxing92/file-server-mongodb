@@ -35,4 +35,18 @@ public class File extends Document implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
+
+  @Override
+  public String toString() {
+    return "File{" +
+        "docId='" + docId + '\'' +
+        ", name='" + name + '\'' +
+        ", id='" + getId() + '\'' +
+        ", md5='" + getMd5() + '\'' +
+        ", size=" + getSize() +
+        ", content=" + getContent() +
+        ", contentType='" + getContentType() + '\'' +
+        ", uploadDate=" + getUploadDate() +
+        "} ";
+  }
 }

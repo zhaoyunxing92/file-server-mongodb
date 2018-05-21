@@ -4,6 +4,8 @@ import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author sunny
@@ -16,7 +18,7 @@ public class Document implements Serializable {
   /**
    * 主键id
    */
- // @Id
+  // @Id
   private String id;
   /**
    * 文件md5
@@ -35,6 +37,10 @@ public class Document implements Serializable {
    * 文件类型
    */
   private String contentType;
+  /**
+   * 上传时间
+   */
+  private Date uploadDate;
 
   public String getId() {
     return id;
@@ -74,5 +80,13 @@ public class Document implements Serializable {
 
   public void setContentType(String contentType) {
     this.contentType = contentType;
+  }
+
+  public Date getUploadDate() {
+    return uploadDate;
+  }
+
+  public void setUploadDate(Date uploadDate) {
+    this.uploadDate = uploadDate;
   }
 }
