@@ -43,21 +43,22 @@ public class FileServiceImpl implements FileService {
    * @return
    */
   @Override
-  public String addFile(MultipartFile file) {
+  public File addFile(MultipartFile file) {
     try {
+      byte[] bytes = contraction(file.getInputStream());
+
       File files = new File();
+      files.setContent(new Binary(bytes));
       files.setName(file.getOriginalFilename());
-      files.setDocId(getDocIdByMd5(file));
+      files.setMd5(MD5Util.getMD5(bytes));
+      files.setSize(bytes.length / 1024);
       files.setUploadDate(new Date());
       files.setContentType(file.getContentType());
+
       mongoTemplate.insert(files, "fs");
-      return files.getId();
-    } catch (NoSuchAlgorithmException e) {
-      //ignore
-      return "";
-    } catch (IOException e) {
-      //ignore
-      return "";
+      return files;
+    } catch (NoSuchAlgorithmException | IOException e) {
+      return null;
     }
   }
 
@@ -69,16 +70,7 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public File getFileById(String id) {
-    File file = mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), File.class, "fs");
-    if (null == file) {
-      return null;
-    }
-    Document doc = getDocById(file.getDocId());
-    doc.setId(file.getId());
-    doc.setUploadDate(file.getUploadDate());
-    doc.setContentType(file.getContentType());
-    BeanUtils.copyProperties(doc, file);
-    return file;
+    return mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), File.class, "fs");
   }
 
   /**
@@ -94,9 +86,6 @@ public class FileServiceImpl implements FileService {
     if (null == file) {
       return null;
     }
-    if (null == process) {
-      return file;
-    }
     try {
       byte[] bytes = file.getContent().getData();
       //重新设置图片http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100,h_200
@@ -104,44 +93,14 @@ public class FileServiceImpl implements FileService {
       file.setContent(new Binary(resizeBytes));
       file.setSize(resizeBytes.length);
       file.setMd5(MD5Util.getMD5(resizeBytes));
+      return file;
     } catch (NoSuchAlgorithmException e) {
       //ignore
       return file;
     }
-    return file;
+
   }
 
-  /**
-   * 根据md5获取文件
-   * 存在时返回文件id，不存在时插入返回文件id
-   *
-   * @param file
-   * @return
-   */
-  private String getDocIdByMd5(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-    byte[] bytes = contraction(file.getInputStream());
-    String md5 = MD5Util.getMD5(bytes);
-    Document doc = mongoTemplate.findOne(new Query(Criteria.where("md5").is(md5)), Document.class, "doc");
-    if (doc == null) {
-      doc = new Document();
-      doc.setMd5(md5);
-      doc.setContent(new Binary(bytes));
-      doc.setSize(bytes.length);
-      doc.setUploadDate(new Date());
-      mongoTemplate.insert(doc, "doc");
-    }
-    return doc.getId();
-  }
-
-  /**
-   * 根据id获取doc
-   *
-   * @param id
-   * @return
-   */
-  private Document getDocById(String id) {
-    return mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), Document.class, "doc");
-  }
 
   /**
    * 压缩返回字节数组
@@ -194,7 +153,7 @@ public class FileServiceImpl implements FileService {
    */
   private FileProcess parseProcess(String process) {
     FileProcess fileProcess = new FileProcess();
-    if (process.isEmpty()) {
+    if (null == process || process.isEmpty()) {
       return fileProcess;
     }
     String[] ps = process.split(",");
@@ -219,8 +178,7 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public List<File> getAll(Integer start, Integer item) {
-    int skip = (start-1)*item;
-
-    return mongoTemplate.find(new Query().with(new Sort(Sort.Direction.DESC,"uploadDate")).limit(item).skip(skip), File.class, "fs");
+    int skip = (start - 1) * item;
+    return mongoTemplate.find(new Query().with(new Sort(Sort.Direction.DESC, "uploadDate")).limit(item).skip(skip), File.class, "fs");
   }
 }

@@ -18,7 +18,7 @@ public interface FileService {
    * @param file
    * @return
    */
-  String addFile(MultipartFile file);
+  File addFile(MultipartFile file);
 
   /**
    * 获取文件
