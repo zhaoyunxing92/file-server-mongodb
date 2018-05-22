@@ -101,7 +101,10 @@
 
             success: function (res, file, fileList) {
                 // let id = res;
-                this.$Message.success('图片上传成功！');
+                this.$Message.success({
+                    content: '图片上传成功！',
+                    duration: 5
+                });
                 let that = this;
                 that.images.unshift(res)
             },
