@@ -3,6 +3,8 @@ package com.sunny.mongodb.file.service;
 import com.sunny.mongodb.file.model.File;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author sunny
  * @class: com.sunny.mongodb.file.service.FileService
@@ -34,4 +36,13 @@ public interface FileService {
    * @return
    */
   File getProcessFileById(String id, String process);
+
+  /**
+   * 获取图片列表
+   *
+   * @param start
+   * @param item
+   * @return
+   */
+  List<File> getAll(Integer start, Integer item);
 }

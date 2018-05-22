@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author sunny
  * @class: com.sunny.mongodb.file.controller.FileController
@@ -31,11 +33,12 @@ public class FileController {
   /**
    * 获取图片
    * http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100,h_100
+   *
    * @param id
    * @param process
    * @return
    */
-  @GetMapping("/{id}")
+  @GetMapping("/img/{id}")
   public ResponseEntity<Object> getFileById(@PathVariable String id, @RequestParam(name = "process", required = false) String process) {
     File file = fileService.getProcessFileById(id, process);
     if (file != null) {
@@ -53,6 +56,19 @@ public class FileController {
     }
   }
 
+  /**
+   * 获取全部图片
+   *
+   * @param start
+   * @param item
+   * @return
+   */
+  @GetMapping("/{start}")
+  public ResponseEntity<Object> getAll(@PathVariable Integer start, @RequestParam(name = "process", required = false, defaultValue = "20") Integer item) {
+    List<File> file = fileService.getAll(start, item);
+    return ResponseEntity.ok()
+        .body(file);
+  }
 
   /**
    * 上传接口

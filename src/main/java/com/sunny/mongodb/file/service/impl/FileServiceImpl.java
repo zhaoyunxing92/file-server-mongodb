@@ -9,6 +9,7 @@ import net.coobird.thumbnailator.Thumbnails;
 import org.bson.types.Binary;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -206,5 +208,19 @@ public class FileServiceImpl implements FileService {
       }
     }
     return fileProcess;
+  }
+
+  /**
+   * 获取图片列表
+   *
+   * @param start
+   * @param item
+   * @return
+   */
+  @Override
+  public List<File> getAll(Integer start, Integer item) {
+    int skip = (start-1)*item;
+
+    return mongoTemplate.find(new Query().with(new Sort(Sort.Direction.DESC,"uploadDate")).limit(item).skip(skip), File.class, "fs");
   }
 }
