@@ -56,6 +56,7 @@ public class FileServiceImpl implements FileService {
       files.setContentType(file.getContentType());
 
       mongoTemplate.insert(files, "fs");
+      files.setContent(null);
       return files;
     } catch (NoSuchAlgorithmException | IOException e) {
       return null;

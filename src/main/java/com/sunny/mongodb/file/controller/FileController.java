@@ -77,7 +77,7 @@ public class FileController {
    * @return
    */
   @PostMapping
-  public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<Object> addFile(@RequestParam("file") MultipartFile file) {
     return ResponseEntity.status(HttpStatus.OK).body(fileService.addFile(file));
   }
 
