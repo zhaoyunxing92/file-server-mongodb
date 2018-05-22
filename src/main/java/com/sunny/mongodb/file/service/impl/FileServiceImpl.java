@@ -2,6 +2,7 @@ package com.sunny.mongodb.file.service.impl;
 
 import com.sunny.mongodb.file.model.Document;
 import com.sunny.mongodb.file.model.File;
+import com.sunny.mongodb.file.model.FileProcess;
 import com.sunny.mongodb.file.service.FileService;
 import com.sunny.mongodb.file.util.MD5Util;
 import net.coobird.thumbnailator.Thumbnails;
@@ -14,8 +15,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +22,6 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import static net.coobird.thumbnailator.Thumbnails.of;
 
 /**
  * @author sunny
@@ -97,7 +95,6 @@ public class FileServiceImpl implements FileService {
     if (null == process) {
       return file;
     }
-
     try {
       byte[] bytes = file.getContent().getData();
       //重新设置图片http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100,h_200
@@ -155,7 +152,7 @@ public class FileServiceImpl implements FileService {
    */
   private byte[] contraction(InputStream is) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    of(is).scale(1f).outputQuality(0.3f).toOutputStream(out);
+    Thumbnails.of(is).scale(1f).outputQuality(0.3f).toOutputStream(out);
     return out.toByteArray();
   }
 
@@ -167,42 +164,57 @@ public class FileServiceImpl implements FileService {
    * @return
    */
   private byte[] resizeImage(byte[] bytes, String process) {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
-
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
       InputStream in = new ByteArrayInputStream(bytes);
-      String[] ps = process.split(",");
-      int width, height, length = ps.length;
-      String first = ps[0];
-      BufferedImage bufferedImage = ImageIO.read(in);
-      if (length == 2) {
-        if (first.startsWith("h_")) {
-          height = Integer.valueOf(first.substring(2));
-          width = Integer.valueOf(ps[1].substring(2));
-        } else if (first.startsWith("w_")) {
-          height = Integer.valueOf(first.substring(2));
-          width = Integer.valueOf(ps[1].substring(2));
-        } else {
-          return bytes;
-        }
-      } else if (length == 1) {
-        if (first.startsWith("h_")) {
-          height = Integer.valueOf(first.substring(2));
-          width = bufferedImage.getWidth();
-        } else if (first.startsWith("w_")) {
-          width = Integer.valueOf(first.substring(2));
-          height = bufferedImage.getHeight();
-        } else {
-          return bytes;
-        }
+      FileProcess fileProcess = parseProcess(process);
+      int width = fileProcess.getWidth(), height = fileProcess.getHeight();
+      if (width != 0 && height != 0) {
+        Thumbnails.of(in).size(width, height).keepAspectRatio(false).toOutputStream(out);
+      } else if (width != 0) {
+        Thumbnails.of(in).width(width).toOutputStream(out);
+      } else if (height != 0) {
+        Thumbnails.of(in).height(height).toOutputStream(out);
       } else {
         return bytes;
       }
-      Thumbnails.of(bufferedImage).size(width, height).keepAspectRatio(false).toOutputStream(out);
+      return out.toByteArray();
     } catch (IOException e) {
-      //e.printStackTrace();
+      return bytes;
     }
-    return out.toByteArray();
   }
 
+  /**
+   * 解析参数
+   *
+   * @param process
+   * @return
+   */
+  private FileProcess parseProcess(String process) {
+    String[] ps = process.split(",");
+    FileProcess fileProcess = new FileProcess();
+    int length = ps.length;
+    String first = ps[0];
+    int width = 0, height = 0;
+    if (length == 2) {
+      if (first.startsWith("h_")) {
+        height = Integer.valueOf(first.substring(2));
+        width = Integer.valueOf(ps[1].substring(2));
+      } else if (first.startsWith("w_")) {
+        width = Integer.valueOf(first.substring(2));
+        height = Integer.valueOf(ps[1].substring(2));
+      }
+      fileProcess.setHeight(height);
+      fileProcess.setWidth(width);
+    } else if (length == 1) {
+      if (first.startsWith("h_")) {
+        height = Integer.valueOf(first.substring(2));
+        fileProcess.setHeight(height);
+      } else if (first.startsWith("w_")) {
+        width = Integer.valueOf(first.substring(2));
+        fileProcess.setWidth(width);
+      }
+    }
+    return fileProcess;
+  }
 }
