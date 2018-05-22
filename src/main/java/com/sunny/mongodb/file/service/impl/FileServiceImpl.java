@@ -191,28 +191,18 @@ public class FileServiceImpl implements FileService {
    * @return
    */
   private FileProcess parseProcess(String process) {
-    String[] ps = process.split(",");
     FileProcess fileProcess = new FileProcess();
-    int length = ps.length;
-    String first = ps[0];
-    int width = 0, height = 0;
-    if (length == 2) {
-      if (first.startsWith("h_")) {
-        height = Integer.valueOf(first.substring(2));
-        width = Integer.valueOf(ps[1].substring(2));
-      } else if (first.startsWith("w_")) {
-        width = Integer.valueOf(first.substring(2));
-        height = Integer.valueOf(ps[1].substring(2));
-      }
-      fileProcess.setHeight(height);
-      fileProcess.setWidth(width);
-    } else if (length == 1) {
-      if (first.startsWith("h_")) {
-        height = Integer.valueOf(first.substring(2));
-        fileProcess.setHeight(height);
-      } else if (first.startsWith("w_")) {
-        width = Integer.valueOf(first.substring(2));
-        fileProcess.setWidth(width);
+    if (process.isEmpty()) {
+      return fileProcess;
+    }
+    String[] ps = process.split(",");
+    for (int i = 0; i < ps.length; i++) {
+      String param = ps[i];
+      Integer value = Integer.valueOf(param.substring(2));
+      if (param.startsWith("h_")) {
+        fileProcess.setHeight(value);
+      } else if (param.startsWith("w_")) {
+        fileProcess.setWidth(value);
       }
     }
     return fileProcess;

@@ -1,2 +1,9 @@
 # file-server-mongodb
-基于mongodb文件服务器
+基于mongodb文件服务器，相同文件只保留一份，同时图片压缩0.3，获取图片目前暂支持修改图片的宽和高，旋转、水印、裁剪后续添加
+## 获取图片, 可以设置图片的大小
+
+>http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100
+
+>http://localhost:8101/file/5b02fadd973bb623f4706671?process=h_100
+
+>http://localhost:8101/file/5b02fadd973bb623f4706671?process=h_100,w_100
