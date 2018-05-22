@@ -1,9 +1,6 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/file
   profiles:
-    active: prod
+    active: dev
   mvc:
     favicon:
       enabled: false
