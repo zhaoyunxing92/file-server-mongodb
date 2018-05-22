@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
-    <conversionRule conversionWord="wex"
-                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
     <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+              value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p})){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
 
+    <property name="maxHistory" value="15"/>
     <!--控制台输出info级别-->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>
-                ${CONSOLE_LOG_PATTERN}
-            </pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </layout>
     </appender>
 
@@ -26,15 +24,12 @@
             <onMismatch>ACCEPT</onMismatch>
         </filter>
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
-        <!--滚动策略 按照天保存-->
+        <!--滚动策略 按照天保存 保存15天-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>
-                ./logs/error/log.%d.log
-            </fileNamePattern>
+            <fileNamePattern>./logs/log.%d.log</fileNamePattern>　
+            <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
     </appender>
 
@@ -44,23 +39,19 @@
             <level>ERROR</level>
         </filter>
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <!--滚动策略 按照天保存-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>
-                ./logs/log.%d.log
-            </fileNamePattern>
+            <fileNamePattern>./logs/error/log.%d.log</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
     </appender>
 
-
-        <root level="info" additivity="false">
-            <appender-ref ref="console"/>
-            <appender-ref ref="file"/>
-            <appender-ref ref="fileErrorLog"/>
-        </root>
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="fileErrorLog"/>
+    </root>
 
 </configuration>
