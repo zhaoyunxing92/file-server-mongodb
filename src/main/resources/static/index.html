@@ -21,7 +21,10 @@
             :max-size="maxSize"
             :on-exceeded-size="exceededSize"
             action="/file"
-            show-upload-list="false"
+            :format="['jpg','jpeg','png']"
+            accept=".png,.jpg,.jpeg,image/png,image/jpg,image/jpeg"
+            :show-upload-list="false"
+            :on-error="onError"
             :on-success="success">
         <div style="padding: 20px 0">
             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
@@ -67,6 +70,10 @@
                         key: 'contentType'
                     },
                     {
+                        title: 'size(kb)',
+                        key: 'size'
+                    },
+                    {
                         title: 'time',
                         key: 'uploadDate'
                     }
@@ -85,29 +92,33 @@
 
         },
         methods: {
+            onError: function (ex, file, fileList) {
+                this.$Modal.error({
+                    title: "文件上传异常",
+                    content: ex
+                });
+            },
+
             success: function (res, file, fileList) {
-                let id = res;
+                // let id = res;
+                this.$Message.success('图片上传成功！');
                 let that = this;
-                that.images.unshift({
-                    'uploadDate': new Date(),
-                    'id': id,
-                    'name': file.name
-                })
+                that.images.unshift(res)
             },
             onRowClick: function (data) {
                 let id = data.id;
-                const content = '<img src="/file/img/' + id + '?process=w_500">';
+                const content = '<img src="/file/img/' + id + '?process=w_300">';
                 this.$Modal.info({
                     title: "图片预览",
                     content: content,
-                    width: '90%',
+                    width: '80%',
                 });
             },
             exceededSize: function (file, fileList) {
                 let size = file.size;
                 let content = '当前文件大小为' + size + 'kb,最大只能上传' + this.maxSize + 'kb文件';
                 this.$Modal.error({
-                    title: "文件上传异常",
+                    title: "文件太大了",
                     content: content
                 });
             }
