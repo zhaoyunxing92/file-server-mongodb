@@ -1,9 +1,8 @@
 package com.sunny.mongodb.file.controller;
 
+
 import com.sunny.mongodb.file.model.File;
 import com.sunny.mongodb.file.service.FileService;
-import net.coobird.thumbnailator.Thumbnails;
-import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -11,12 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author sunny
@@ -37,7 +30,7 @@ public class FileController {
 
   /**
    * 获取图片
-   *
+   * http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100,h_100
    * @param id
    * @param process
    * @return
@@ -71,4 +64,6 @@ public class FileController {
   public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file) {
     return ResponseEntity.status(HttpStatus.OK).body(fileService.addFile(file));
   }
+
+
 }
