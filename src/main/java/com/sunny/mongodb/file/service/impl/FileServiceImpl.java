@@ -1,15 +1,11 @@
 package com.sunny.mongodb.file.service.impl;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.sunny.mongodb.file.model.Document;
 import com.sunny.mongodb.file.model.File;
 import com.sunny.mongodb.file.model.FileProcess;
 import com.sunny.mongodb.file.service.FileService;
 import com.sunny.mongodb.file.util.MD5Util;
 import net.coobird.thumbnailator.Thumbnails;
 import org.bson.types.Binary;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,9 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -193,9 +187,22 @@ public class FileServiceImpl implements FileService {
     fieldsObject.put("_id", true);
     fieldsObject.put("uploadDate", true);
     fieldsObject.put("name", true);
-   // fieldsObject.put("md5", true);
+    // fieldsObject.put("md5", true);
     Query query = new BasicQuery(queryObject, fieldsObject);
 
     return mongoTemplate.find(query.with(new Sort(Sort.Direction.DESC, "uploadDate")).limit(item).skip(skip), File.class, "fs");
+  }
+
+  /**
+   * 根据id删除文件
+   *
+   * @param id
+   */
+  @Override
+  public void removeFile(String id) {
+    org.bson.Document queryObject = new org.bson.Document();
+    queryObject.put("_id", id);
+    Query query = new BasicQuery(queryObject);
+    mongoTemplate.remove(query, "fs");
   }
 }

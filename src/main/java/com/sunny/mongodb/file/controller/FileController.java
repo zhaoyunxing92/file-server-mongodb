@@ -52,7 +52,7 @@ public class FileController {
           .header("Connection", "keep-alive")
           .body(file.getContent().getData());
     } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("file [%s] not found", id));
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("img [%s] not found", id));
     }
   }
 
@@ -63,7 +63,7 @@ public class FileController {
    * @param item
    * @return
    */
-  @GetMapping("/{start}")
+  @GetMapping("/imgs/{start}")
   public ResponseEntity<Object> getAll(@PathVariable Integer start, @RequestParam(name = "process", required = false, defaultValue = "20") Integer item) {
     List<File> file = fileService.getAll(start, item);
     return ResponseEntity.ok()
@@ -76,10 +76,20 @@ public class FileController {
    * @param file
    * @return
    */
-  @PostMapping
+  @PostMapping("/img")
   public ResponseEntity<Object> addFile(@RequestParam("file") MultipartFile file) {
-    return ResponseEntity.status(HttpStatus.OK).body(fileService.addFile(file));
+    return ResponseEntity.ok().body(fileService.addFile(file));
   }
 
-
+  /**
+   * 根据id删除图片
+   *
+   * @param id
+   * @return
+   */
+  @DeleteMapping("/img/{id}")
+  public ResponseEntity<Object> delFile(@PathVariable String id) {
+    fileService.removeFile(id);
+    return ResponseEntity.ok().body(String.format("img [%s] del ok", id));
+  }
 }

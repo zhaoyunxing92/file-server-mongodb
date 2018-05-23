@@ -45,4 +45,11 @@ public interface FileService {
    * @return
    */
   List<File> getAll(Integer start, Integer item);
+
+  /**
+   * 根据id删除文件
+   *
+   * @param id
+   */
+  void removeFile(String id);
 }
