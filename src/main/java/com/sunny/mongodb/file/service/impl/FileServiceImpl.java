@@ -1,5 +1,7 @@
 package com.sunny.mongodb.file.service.impl;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.sunny.mongodb.file.model.Document;
 import com.sunny.mongodb.file.model.File;
 import com.sunny.mongodb.file.model.FileProcess;
@@ -11,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -180,6 +185,17 @@ public class FileServiceImpl implements FileService {
   @Override
   public List<File> getAll(Integer start, Integer item) {
     int skip = (start - 1) * item;
-    return mongoTemplate.find(new Query().with(new Sort(Sort.Direction.DESC, "uploadDate")).limit(item).skip(skip), File.class, "fs");
+    //指定返回的字段
+    org.bson.Document queryObject = new org.bson.Document();
+    org.bson.Document fieldsObject = new org.bson.Document();
+    fieldsObject.put("size", true);
+    fieldsObject.put("contentType", true);
+    fieldsObject.put("_id", true);
+    fieldsObject.put("uploadDate", true);
+    fieldsObject.put("name", true);
+   // fieldsObject.put("md5", true);
+    Query query = new BasicQuery(queryObject, fieldsObject);
+
+    return mongoTemplate.find(query.with(new Sort(Sort.Direction.DESC, "uploadDate")).limit(item).skip(skip), File.class, "fs");
   }
 }
