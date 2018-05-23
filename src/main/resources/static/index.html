@@ -20,7 +20,7 @@
             type="drag"
             :max-size="maxSize"
             :on-exceeded-size="exceededSize"
-            action="/file"
+            action="/file/img"
             :format="['jpg','jpeg','png']"
             accept=".png,.jpg,.jpeg,image/png,image/jpg,image/jpeg"
             :show-upload-list="false"
@@ -33,7 +33,7 @@
     </Upload>
 
 
-    <i-table :columns="columns" :data="images" @on-row-click="onRowClick"></i-table>
+    <i-table :columns="columns" :data="images"></i-table>
 </div>
 
 </body>
@@ -53,7 +53,7 @@
         el: '#app',
         data() {
             return {
-                maxSize: 1024,
+                maxSize: 10240,
                 images: [],
                 modal: false,
                 columns: [
@@ -76,51 +76,104 @@
                     {
                         title: 'time',
                         key: 'uploadDate'
+                    }, {
+                        title: 'Action',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.show(params)
+                                        }
+                                    }
+                                }, '查看'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.remove(params.row.id, params.index)
+                                        }
+                                    }
+                                }, '删除')
+                            ]);
+                        }
                     }
                 ]
             }
         },
         mounted: function () {
             let that = this;
-            axios.get('/file/1')
+            axios.get('/file/imgs/1')
                 .then(function (res) {
                     that.images = res.data;
+                    that.$Message.success('加载成功！');
                 })
                 .catch(function (error) {
-                    this.$Message.error('获取图片列表异常' + error);
+                    that.$Message.error('获取图片列表异常');
+                   // this.$Message.error('This is an error tip');
                 });
 
         },
         methods: {
             onError: function (ex, file, fileList) {
-                this.$Modal.error({
+                let that = this;
+                that.$Modal.error({
                     title: "文件上传异常",
                     content: ex
                 });
             },
 
             success: function (res, file, fileList) {
-                // let id = res;
-                this.$Message.success({
+                let that = this;
+                that.$Message.success({
                     content: '图片上传成功！',
                     duration: 5
                 });
-                let that = this;
                 that.images.unshift(res)
             },
-            onRowClick: function (data) {
-                let id = data.id;
+            show: function (data) {
+                //console.log(data.row);
+                let id = data.row.id,that=this;
                 const content = '<img src="/file/img/' + id + '?process=w_300">';
-                this.$Modal.info({
+                that.$Modal.info({
                     title: "图片预览",
                     content: content,
                     width: '80%',
                 });
             },
+            /**
+             * 删除图片
+             */
+            remove: function (id, index) {
+                let that = this;
+                axios.delete('/file/img/'+id)
+                    .then(function (res) {
+                        that.$Message.success(res.data);
+                        // that.images = res.data;
+                    })
+                    .catch(function (error) {
+                        that.$Message.error('删除图片异常：' + error);
+                    });
+                this.images.splice(index, 1);
+            },
             exceededSize: function (file, fileList) {
-                let size = file.size;
+                let size = file.size,
+                    that = this;
                 let content = '当前文件大小为' + size + 'kb,最大只能上传' + this.maxSize + 'kb文件';
-                this.$Modal.error({
+                that.$Modal.error({
                     title: "文件太大了",
                     content: content
                 });
