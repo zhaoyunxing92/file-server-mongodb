@@ -23,7 +23,6 @@
             action="/file/img"
             :format="['jpg','jpeg','png']"
             accept=".png,.jpg,.jpeg,image/png,image/jpg,image/jpeg"
-            :show-upload-list="false"
             :on-error="onError"
             :on-success="success">
         <div style="padding: 20px 0">
@@ -33,7 +32,7 @@
     </Upload>
 
 
-    <i-table :columns="columns" :data="images"></i-table>
+    <i-table :loading="true" :columns="columns" :data="images"></i-table>
 </div>
 
 </body>
