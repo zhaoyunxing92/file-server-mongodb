@@ -32,7 +32,7 @@
     </Upload>
 
 
-    <i-table :loading="true" :columns="columns" :data="images"></i-table>
+    <i-table :loading="loading" :columns="columns" :data="images"></i-table>
 </div>
 
 </body>
@@ -54,6 +54,7 @@
             return {
                 maxSize: 10240,
                 images: [],
+                loading: true,
                 modal: false,
                 columns: [
                     {
@@ -117,12 +118,13 @@
             let that = this;
             axios.get('/file/imgs/1')
                 .then(function (res) {
+                    that.loading = false;
                     that.images = res.data;
                     that.$Message.success('加载成功！');
                 })
                 .catch(function (error) {
                     that.$Message.error('获取图片列表异常');
-                   // this.$Message.error('This is an error tip');
+                    // this.$Message.error('This is an error tip');
                 });
 
         },
@@ -145,7 +147,7 @@
             },
             show: function (data) {
                 //console.log(data.row);
-                let id = data.row.id,that=this;
+                let id = data.row.id, that = this;
                 const content = '<img src="/file/img/' + id + '?process=w_300">';
                 that.$Modal.info({
                     title: "图片预览",
@@ -158,7 +160,7 @@
              */
             remove: function (id, index) {
                 let that = this;
-                axios.delete('/file/img/'+id)
+                axios.delete('/file/img/' + id)
                     .then(function (res) {
                         that.$Message.success(res.data);
                         // that.images = res.data;
