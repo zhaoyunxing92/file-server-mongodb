@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: dev
+  mvc:
+    favicon:
+      enabled: false
+  servlet:
+    multipart:
+      max-file-size: 10240KB
+      max-request-size: 10240KB
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss:sss
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/file
+
+server:
+  port: 7100

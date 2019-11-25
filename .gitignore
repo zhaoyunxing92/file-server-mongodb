@@ -1,0 +1,8 @@
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.idea
+*.iws
+*.iml
+*.ipr
+/logs/
+!target/file-server-mongodb-1.0.jar

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  # mongo server
+  mongo:
+    image: mongo:latest
+    container_name: mongo # docker启动后的名称
+    network_mode: host
+    ports:
+      - 27017:27017
+  # file server
+  file_server:
+     image: zhaoyunxing/file-server:latest
+     container_name: file-server # docker启动后的名称
+     network_mode: host
+     ports:
+       - 7100:7100

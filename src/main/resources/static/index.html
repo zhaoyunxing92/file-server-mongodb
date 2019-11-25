@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no" id="viewport" name="viewport">
+    <!-- import Vue.js -->
+    <script src="//vuejs.org/js/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- import stylesheet -->
+    <link rel="stylesheet" href="//unpkg.com/iview/dist/styles/iview.css">
+    <!-- import iView -->
+    <script src="//unpkg.com/iview/dist/iview.min.js"></script>
+    <title>图片服务器</title>
+</head>
+<body class="content">
+<div id="app">
+    <h1>图片上传，最大支持 {{maxSize}} kb</h1>
+    <Upload id="upload"
+            multiple
+            type="drag"
+            :max-size="maxSize"
+            :on-exceeded-size="exceededSize"
+            action="/file/img"
+            :format="['jpg','jpeg','png']"
+            accept=".png,.jpg,.jpeg,image/png,image/jpg,image/jpeg"
+            :on-error="onError"
+            :on-success="success">
+        <div style="padding: 20px 0">
+            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+            <p>Click or drag files here to upload</p>
+        </div>
+    </Upload>
+
+
+    <i-table :loading="loading" :columns="columns" :data="images"></i-table>
+</div>
+
+</body>
+<style>
+    .content {
+        margin: 10px auto;
+        text-align: center;
+    }
+
+    #upload {
+        width: 80%;
+        margin: 10px auto;
+    }
+</style>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                maxSize: 10240,
+                images: [],
+                loading: true,
+                modal: false,
+                columns: [
+                    {
+                        title: 'id',
+                        key: 'id'
+                    },
+                    {
+                        title: 'name',
+                        key: 'name'
+                    },
+                    {
+                        title: 'type',
+                        key: 'contentType'
+                    },
+                    {
+                        title: 'size(kb)',
+                        key: 'size'
+                    },
+                    {
+                        title: 'time',
+                        key: 'uploadDate'
+                    }, {
+                        title: 'Action',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.show(params)
+                                        }
+                                    }
+                                }, '查看'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.remove(params.row.id, params.index)
+                                        }
+                                    }
+                                }, '删除')
+                            ]);
+                        }
+                    }
+                ]
+            }
+        },
+        mounted: function () {
+            let that = this;
+            axios.get('/file/imgs/1')
+                .then(function (res) {
+                    that.loading = false;
+                    that.images = res.data;
+                    that.$Message.success('加载成功！');
+                })
+                .catch(function (error) {
+                    that.$Message.error('获取图片列表异常');
+                    // this.$Message.error('This is an error tip');
+                });
+
+        },
+        methods: {
+            onError: function (ex, file, fileList) {
+                let that = this;
+                that.$Modal.error({
+                    title: "文件上传异常",
+                    content: ex
+                });
+            },
+
+            success: function (res, file, fileList) {
+                let that = this;
+                that.$Message.success({
+                    content: '图片上传成功！',
+                    duration: 5
+                });
+                that.images.unshift(res)
+            },
+            show: function (data) {
+                //console.log(data.row);
+                let id = data.row.id, that = this;
+                const content = '<img src="/file/img/' + id + '?process=w_300">';
+                that.$Modal.info({
+                    title: "图片预览",
+                    content: content,
+                    width: '80%',
+                });
+            },
+            /**
+             * 删除图片
+             */
+            remove: function (id, index) {
+                let that = this;
+                axios.delete('/file/img/' + id)
+                    .then(function (res) {
+                        that.$Message.success(res.data);
+                        // that.images = res.data;
+                    })
+                    .catch(function (error) {
+                        that.$Message.error('删除图片异常：' + error);
+                    });
+                this.images.splice(index, 1);
+            },
+            exceededSize: function (file, fileList) {
+                let size = file.size,
+                    that = this;
+                let content = '当前文件大小为' + size + 'kb,最大只能上传' + this.maxSize + 'kb文件';
+                that.$Modal.error({
+                    title: "文件太大了",
+                    content: content
+                });
+            }
+        }
+    })
+</script>
+</html>
