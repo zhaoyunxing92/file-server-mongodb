@@ -1,5 +1,7 @@
 package com.sunny.mongodb.file.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -8,30 +10,17 @@ import java.io.Serializable;
  * @date: 2018-05-22 10:44
  * @des:
  */
+@Data
 public class FileProcess implements Serializable {
-  private static final long serialVersionUID = 1770399523395749814L;
-  /**
-   * 宽
-   */
-  private int width;
-  /**
-   * 高
-   */
-  private int height;
 
-  public int getWidth() {
-    return width > 0 ? width : 0;
-  }
+    private static final long serialVersionUID = 1770399523395749814L;
+    /**
+     * 宽
+     */
+    private int width;
+    /**
+     * 高
+     */
+    private int height;
 
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
-  public int getHeight() {
-    return height > 0 ? height : 0;
-  }
-
-  public void setHeight(int height) {
-    this.height = height;
-  }
 }

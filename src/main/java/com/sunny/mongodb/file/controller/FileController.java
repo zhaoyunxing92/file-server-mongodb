@@ -22,13 +22,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/file")
 public class FileController {
-  @Autowired
-  private FileService fileService;
+  private final FileService fileService;
 
-  @Value("${server.address}")
-  private String serverAddress;
+//  @Value("${server.address}")
+//  private String serverAddress;
   @Value("${server.port}")
   private String serverPort;
+
+  public FileController(FileService fileService) {
+    this.fileService = fileService;
+  }
 
   /**
    * 获取图片
@@ -45,7 +48,7 @@ public class FileController {
       return ResponseEntity.ok()
           //.header(HttpHeaders.ACCEPT_ENCODING, "gbk")
           .header(HttpHeaders.ETAG, file.getMd5())
-          .header(HttpHeaders.SERVER, serverAddress)
+//          .header(HttpHeaders.SERVER, serverAddress)
           //.header(HttpHeaders.CONTENT_DISPOSITION, "name=\"" + file.getName() + "\"")
           .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
           .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.getSize()))

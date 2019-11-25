@@ -1,11 +1,12 @@
 package com.sunny.mongodb.file.handler;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.Objects;
 
 /**
  * @author sunny
@@ -25,6 +26,6 @@ public class FileAppGlobalExceptionHandler {
   public ResponseEntity<Object> fileSizeLimitException(MaxUploadSizeExceededException ex) {
     String msg = ex.getMessage();
     return ResponseEntity.status(HttpStatus.NOT_EXTENDED)
-        .body(msg.substring(msg.lastIndexOf(":") + 1));
+        .body(Objects.requireNonNull(msg).substring(msg.lastIndexOf(":") + 1));
   }
 }

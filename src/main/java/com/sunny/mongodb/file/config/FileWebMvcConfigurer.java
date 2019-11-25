@@ -17,6 +17,5 @@ public class FileWebMvcConfigurer implements WebMvcConfigurer {
         .allowCredentials(true)
         .allowedMethods("GET", "POST", "DELETE", "PUT")
         .maxAge(3600);
-
   }
 }

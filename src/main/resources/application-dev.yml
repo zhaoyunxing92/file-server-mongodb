@@ -1,7 +1,0 @@
-server:
-  port: 8101
-  address: localhost
-spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/file

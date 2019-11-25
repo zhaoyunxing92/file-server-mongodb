@@ -6,8 +6,9 @@
 由于没有使用`GridFS`所以保存的文件不要超过16M
 ## 获取图片, 可以设置图片的大小
 
->http://localhost:8101/file/5b02fadd973bb623f4706671?process=w_100
+>http://localhost:8101/file/img/5b1695b888ae35145016e5f0
 
->http://localhost:8101/file/5b02fadd973bb623f4706671?process=h_100
+>http://localhost:8101/file/img/5b02fadd973bb623f4706671?process=h_100
 
->http://localhost:8101/file/5b02fadd973bb623f4706671?process=h_100,w_100
+>http://localhost:8101/file/img/5b02fadd973bb623f4706671?process=h_100,w_100
+

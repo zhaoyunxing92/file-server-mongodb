@@ -1,12 +1,8 @@
 package com.sunny.mongodb.file.config;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * @author sunny

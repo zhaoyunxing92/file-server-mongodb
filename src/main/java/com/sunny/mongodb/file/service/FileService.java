@@ -12,44 +12,44 @@ import java.util.List;
  * @des:
  */
 public interface FileService {
-  /**
-   * 保存文件
-   *
-   * @param file
-   * @return
-   */
-  File addFile(MultipartFile file);
+    /**
+     * 保存文件
+     *
+     * @param file
+     * @return
+     */
+    File addFile(MultipartFile file);
 
-  /**
-   * 获取文件
-   *
-   * @param id
-   * @return
-   */
-  File getFileById(String id);
+    /**
+     * 获取文件
+     *
+     * @param id
+     * @return
+     */
+    File getFileById(String id);
 
-  /**
-   * 处理图片
-   *
-   * @param id
-   * @param process
-   * @return
-   */
-  File getProcessFileById(String id, String process);
+    /**
+     * 处理图片
+     *
+     * @param id
+     * @param process
+     * @return
+     */
+    File getProcessFileById(String id, String process);
 
-  /**
-   * 获取图片列表
-   *
-   * @param start
-   * @param item
-   * @return
-   */
-  List<File> getAll(Integer start, Integer item);
+    /**
+     * 获取图片列表
+     *
+     * @param start
+     * @param item
+     * @return
+     */
+    List<File> getAll(Integer start, Integer item);
 
-  /**
-   * 根据id删除文件
-   *
-   * @param id
-   */
-  void removeFile(String id);
+    /**
+     * 根据id删除文件
+     *
+     * @param id
+     */
+    void removeFile(String id);
 }
