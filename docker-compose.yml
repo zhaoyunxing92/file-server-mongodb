@@ -14,3 +14,5 @@ services:
      network_mode: host
      ports:
        - 7100:7100
+     depends_on:
+       - mongo
